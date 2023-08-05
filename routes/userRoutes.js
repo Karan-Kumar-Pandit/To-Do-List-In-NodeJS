@@ -8,8 +8,4 @@ router
   .post(userRouter.register)
   .post(userRouter.login);
 
-
 module.exports = router;
-
-
-
