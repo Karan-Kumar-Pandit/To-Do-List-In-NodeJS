@@ -1,4 +1,5 @@
 const User = require('../models/userModels');
+const Token = require('../models/tokensModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -6,6 +7,7 @@ const jwt = require('jsonwebtoken');
 exports.register = async (req, res) => {
      const { username, password, password_confirmation, firstname, lastname } = req.body;
      const existingUser = await User.findOne({ username: username });
+     console.log(existingUser);
      if (existingUser) {
           res.send({ status: 'failed', message: 'Username already exists' });
      } else {
@@ -21,13 +23,9 @@ exports.register = async (req, res) => {
                               lastname: lastname
                          });
                          await user.save();
-                         const saved_user = await User.findOne({ username: username });
-                         //  Generate JWT Token
-                         const token = jwt.sign({ userID: saved_user._id }, process.env.JWT_SECRET_KAY, { expiresIn: '24h' });
                          res.status(201).send({
                               status: 'success',
-                              message: 'User registered successfully',
-                              token: token
+                              message: 'User registered successfully'
                          });
                     } catch (error) {
                          console.log(error);
@@ -59,15 +57,18 @@ exports.login = async (req, res) => {
                     if (user.username === username && passwordMatch) {
                          // Generate JWT Token
                          const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET_KAY, { expiresIn: '24h' });
+                         // Save the token to the database
+                         const tokenEntry = new Token({ token: token, userID: user._id });
+                         await tokenEntry.save();
                          res.send({ status: 'success', message: 'Login Success', token: token });
                     } else {
                          res.send({ status: 'failed', message: 'Username or Password is not valid' });
                     }
                } else {
-                    res.send({ status: 'failed', message: 'You are not a Register User' });
+                    res.send({ status: 'failed', message: 'You are not registered.' });
                }
           } else {
-               res.send({ status: 'failed', message: 'All fields are required' });
+               res.send({ status: 'failed', message: 'All fields are required.' });
           }
      } catch (error) {
           console.log(error);
