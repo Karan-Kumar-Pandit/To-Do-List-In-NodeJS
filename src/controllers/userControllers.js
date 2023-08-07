@@ -52,14 +52,18 @@ exports.login = async (req, res) => {
           const { username, password } = req.body;
           if (username && password) {
                const user = await User.findOne({ username: username });
+
                if (user != null) {
                     const passwordMatch = await bcrypt.compare(password, user.password);
+
                     if (user.username === username && passwordMatch) {
                          // Generate JWT Token
-                         const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET_KAY, { expiresIn: '24h' });
+                         const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET_KAY, { expiresIn: '5m' });
+
                          // Save the token to the database
                          const tokenEntry = new Token({ token: token, userID: user._id });
                          await tokenEntry.save();
+
                          res.send({ status: 'success', message: 'Login Success', token: token });
                     } else {
                          res.send({ status: 'failed', message: 'Username or Password is not valid' });

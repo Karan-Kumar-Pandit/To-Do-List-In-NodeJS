@@ -4,6 +4,7 @@ const Task = require('../models/toDoListModel');
 // --------------------------------------------
 exports.getAllToDoList = async (req, res) => {
      try {
+          // console.log(req.user);
           const task = await Task.find(req.query);
           res.status(200).json({
                status: 'success',

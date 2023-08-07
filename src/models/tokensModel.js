@@ -12,7 +12,7 @@ const tokenSchema = new mongoose.Schema({
      },
      createdAt: {
           type: Date,
-          expires: '24h', // The token will expire after 24 hours
+          expires: '5m', // The token will expire after 24 hours
           default: Date.now
      }
 });
